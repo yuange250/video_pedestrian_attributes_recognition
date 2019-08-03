@@ -37,7 +37,7 @@ class Mars(object):
     Args:
         min_seq_len (int): tracklet with length shorter than this value will be discarded (default: 0).
     """
-    root = '/data/chenzy/datasets/mars'
+    root = './data/mars'
 
     train_name_path = osp.join(root, 'info/train_name.txt')
     test_name_path = osp.join(root, 'info/test_name.txt')
@@ -204,7 +204,7 @@ class DukeMTMC_Video(object):
         min_seq_len (int): tracklet with length shorter than this value will be discarded (default: 0).
     """
     # root = '/home/chenzy/datasets/mars'
-    root = '/data/chenzy/datasets/duke_mtmc/DukeMTMC-VideoReID'
+    root = './data/duke'
     train_name_path = os.path.join(root, "train")
     gallery_name_path = os.path.join(root, "gallery")
     query_name_path = os.path.join(root, "query")
@@ -372,9 +372,3 @@ if __name__ == '__main__':
     #dataset = Market1501()
     #dataset = Mars()
     pass
-
-
-
-
-
-
