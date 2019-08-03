@@ -44,7 +44,7 @@ class Mars(object):
     track_train_info_path = osp.join(root, 'info/tracks_train_info.mat')
     track_test_info_path = osp.join(root, 'info/tracks_test_info.mat')
     query_IDX_path = osp.join(root, 'info/query_IDX.mat')
-    attributes_path = osp.join(root, "mars_attr.csv")
+    attributes_path = osp.join(root, "mars_attributes.csv")
     columns = ["action", "angle", "upcolor",
                           "downcolor", "age", "up", "down", "bag",
                           "backpack", "hat", "handbag", "hair",
@@ -208,7 +208,7 @@ class DukeMTMC_Video(object):
     train_name_path = os.path.join(root, "train")
     gallery_name_path = os.path.join(root, "gallery")
     query_name_path = os.path.join(root, "query")
-    attributes_path = osp.join(root, "new_gt_single_upcolor.csv")
+    attributes_path = osp.join(root, "duke_attributes.csv")
 
     columns = ["action", "angle",
                "backpack", "shoulder bag", "handbag", "boots", "gender", "hat", "shoes", "top", "downcolor", "topcolor"]
