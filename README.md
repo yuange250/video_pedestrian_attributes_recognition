@@ -1,3 +1,4 @@
+# The attributes dataset can be downlowded [here](https://pan.baidu.com/s/1vSwoqM9s1ImKzRZHDlmpWQ), passwd:beda
 # video_pedestrian_attributes_recognition
   Codes for the paper "A Temporal Attentive Approach for Video-Based Pedestrian Attribute Recognition".
   
