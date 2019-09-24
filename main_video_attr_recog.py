@@ -37,7 +37,7 @@ parser.add_argument('--width', type=int, default=112,
                     help="width of an image (default: 112)")
 parser.add_argument('--seq-len', type=int, default=6, help="number of images to sample in a tracklet")
 parser.add_argument('--max-traclets-len', type=int, default=250, help="number of parts to sample in a tracklet")
-parser.add_argument('--gpu-devices', default='5, 6', type=str, help='gpu device ids for CUDA_VISIBLE_DEVICES')
+parser.add_argument('--gpu-devices', default='0, 1', type=str, help='gpu device ids for CUDA_VISIBLE_DEVICES')
 parser.add_argument('--num-instances', type=int, default=4,
                     help="number of instances per identity")
 parser.add_argument('--test-batch', default=1, type=int, help="has to be 1")
@@ -65,7 +65,7 @@ parser.add_argument('--weight-decay', default=5e-04, type=float,
 parser.add_argument('--margin', type=float, default=0.3, help="margin for triplet loss")
 
 # Architecture
-parser.add_argument('-a', '--arch', type=str, default='attr_resnet50tp', help="attr_resnet503d, attr_resnet50tp, attr_resnet50tp_baseline")
+parser.add_argument('-a', '--arch', type=str, default='attr_resnet50tp_baseline', help="attr_resnet503d, attr_resnet50tp, attr_resnet50tp_baseline")
 parser.add_argument('-model-type', '--model_type', type=str, default='ta', help="tp(temporal pooling), ta(temporal attention), rnn(rnn attention)")
 
 parser.add_argument('--pool', type=str, default='avg', choices=['avg', 'max'])
@@ -201,9 +201,12 @@ def attr_main():
             # break
         # test(model, queryloader, galleryloader, args.pool, use_gpu)
         return
-
-    optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.module.parameters()), lr=args.lr,
-                                 weight_decay=args.weight_decay)
+    if use_gpu:
+        optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.module.parameters()), lr=args.lr,
+                                     weight_decay=args.weight_decay)
+    else:
+        optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=args.lr,
+                                     weight_decay=args.weight_decay)
     # avr_acc = attr_test(model, criterion, queryloader, use_gpu)
     if args.stepsize > 0:
         scheduler = lr_scheduler.StepLR(optimizer, step_size=args.stepsize, gamma=args.gamma)
@@ -285,7 +288,6 @@ def attr_test(model, criterion, testloader, use_gpu):
                 else:
                     attrs = [a.view(-1).cuda() for a in attrs]
 
-            outputs = model(imgs)
             if len(attrs) >= len(args.attr_lens[0]) + len(args.attr_lens[1]):
                 num += 1
                 outputs = model(imgs)
