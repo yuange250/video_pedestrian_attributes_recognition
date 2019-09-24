@@ -15,7 +15,6 @@ from collections import Counter
 
 from tqdm import tqdm
 
-from utils import mkdir_if_missing, write_json, read_json
 from video_loader import read_image
 import transforms as T
 
@@ -55,7 +54,7 @@ class Mars(object):
         # prepare meta data
         train_names = self._get_names(self.train_name_path)
         test_names = self._get_names(self.test_name_path)
-        self.attributes = pd.read_csv(osp.join(self.root, "mars_attr.csv"))
+        self.attributes = pd.read_csv(self.attributes_path)
         track_train = loadmat(self.track_train_info_path)['track_train_info'] # numpy.ndarray (8298, 4)
         track_test = loadmat(self.track_test_info_path)['track_test_info'] # numpy.ndarray (12180, 4)
         query_IDX = loadmat(self.query_IDX_path)['query_IDX'].squeeze() # numpy.ndarray (1980,)
@@ -161,8 +160,8 @@ class Mars(object):
             attribute = []
             if attr:
                 t_id = int(img_names[0].split("F")[0].split("T")[1])
-                attribute = self.attributes[(self.attributes.id == pid) & (self.attributes.camera == camid) & (
-                        self.attributes.tracklet == t_id)].values
+                attribute = self.attributes[(self.attributes.person_id == pid) & (self.attributes.camera_id == camid) & (
+                        self.attributes.tracklets_id == t_id)].values
                 if len(attribute) > 0:
                     attribute = attribute[0, 3:]
                     attribute = attribute[0 : 2].tolist() + attribute[9:].tolist()
@@ -210,8 +209,7 @@ class DukeMTMC_Video(object):
     query_name_path = os.path.join(root, "query")
     attributes_path = osp.join(root, "duke_attributes.csv")
 
-    columns = ["action", "angle",
-               "backpack", "shoulder bag", "handbag", "boots", "gender", "hat", "shoes", "top", "downcolor", "topcolor"]
+    columns = ["action", "angle", "backpack", "shoulder bag", "handbag", "boots", "gender", "hat", "shoes", "top", "downcolor", "topcolor"]
     # attr_lens = [[5, 6, 2, 2, 2, 2, 2, 2, 2],[2, 2, 2, 2, 2, 2, 2, 2, 8, 9]]
     attr_lens = [[5, 6], [2, 2, 2, 2, 2, 2, 2, 2, 8, 9]]
     def __init__(self, min_seq_len=0, attr=True):
@@ -324,8 +322,8 @@ class DukeMTMC_Video(object):
             attribute = []
             if attr:
                 t_id = int(tracklets_path[tracklet_idx].split("/")[-1])
-                attribute = self.attributes[(self.attributes.id == pid) & (self.attributes.cam_id == camid) & (
-                        self.attributes.tracklet_id == t_id)].values
+                attribute = self.attributes[(self.attributes.person_id == pid) & (self.attributes.camera_id == camid) & (
+                        self.attributes.tracklets_id == t_id)].values
                 if len(attribute) > 0:
                     attribute = attribute[0, 3:]
                     attribute = attribute[0 : 2].tolist() + attribute[9:].tolist()
