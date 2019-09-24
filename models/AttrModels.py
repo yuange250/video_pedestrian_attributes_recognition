@@ -175,9 +175,11 @@ class MultiLabelAttributeModuleRNN(nn.Module):
         temp_f = temp_f.view(b, t, -1)
         temp_f_rnn, (h_n, c_n) = self.lstm(temp_f)
         out_labels = []
+        attentions = []
         temp_f = temp_f + temp_f_rnn
         for c in self.classifiers:
-            out = c(temp_f, b, t)
+            a, out = c(temp_f, b, t)
+            attentions.append(a)
             out_labels.append(out)
         return out_labels
 
@@ -259,34 +261,3 @@ class AttrResNet503D(nn.Module):
         result.extend(id_related_labels)
         result.extend(id_unrelated_labels)
         return result
-
-class AttrResNet50RNN(nn.Module):
-    def __init__(self, num_classes, loss={'xent'}, **kwargs):
-        super(AttrResNet50RNN, self).__init__()
-        self.loss = loss
-        resnet50 = torchvision.models.resnet50(pretrained=True)
-        self.base = nn.Sequential(*list(resnet50.children())[:-2])
-        self.hidden_dim = 512
-        self.feature_dim = 2048
-        # self.classifier = nn.Linear(self.hidden_dim, num_classes)
-        self.lstm = nn.LSTM(input_size=self.feature_dim, hidden_size=self.hidden_dim, num_layers=1, batch_first=True)
-    def forward(self, x):
-        b = x.size(0)
-        t = x.size(1)
-        x = x.view(b*t,x.size(2), x.size(3), x.size(4))
-        x = self.base(x)
-        x = F.avg_pool2d(x, x.size()[2:])
-        x = x.view(b,t,-1)
-        output, (h_n, c_n) = self.lstm(x)
-        output = output.permute(0, 2, 1)
-        f = F.avg_pool1d(output, t)
-        f = f.view(b, self.hidden_dim)
-
-        if self.loss == {'xent'}:
-            return y
-        elif self.loss == {'xent', 'htri'}:
-            return y, f
-        elif self.loss == {'cent'}:
-            return y, f
-        else:
-            raise KeyError("Unsupported loss: {}".format(self.loss))
